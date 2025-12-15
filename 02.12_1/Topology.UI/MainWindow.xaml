@@ -1,0 +1,219 @@
+<Window x:Class="Topology.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:conv="clr-namespace:Topology.UI.Converters"
+        mc:Ignorable="d"
+        Title="Построитель конечных топологических пространств"
+        Height="900" Width="1400"
+        Background="#0f172a"
+        FontFamily="Segoe UI">
+    <Window.Resources>
+        <conv:MaskToNamesConverter x:Key="MaskToNamesConverter" />
+        <Style TargetType="TextBlock" x:Key="SectionHeader">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#e2e8f0" />
+            <Setter Property="Margin" Value="0 0 0 6" />
+        </Style>
+        <Style TargetType="Border" x:Key="Card">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Margin" Value="0 0 0 10" />
+            <Setter Property="Background" Value="#172033" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="0 4 0 0" />
+            <Setter Property="Padding" Value="10 6" />
+            <Setter Property="Background" Value="#2563eb" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="#1d4ed8" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="0 4 0 0" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Background" Value="#0b1221" />
+            <Setter Property="Foreground" Value="#e2e8f0" />
+            <Setter Property="BorderBrush" Value="#1f2937" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="0 4 0 0" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Background" Value="#0b1221" />
+            <Setter Property="Foreground" Value="#e2e8f0" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="420" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая панель -->
+        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Точки (X)" />
+                        <TextBlock Text="Щелкните по холсту, чтобы добавить точку. Нажмите по точке, чтобы выделить или перетащить."
+                                   Foreground="#94a3b8" TextWrapping="Wrap" />
+                        <TextBlock Text="Имя выбранной точки" Foreground="#cbd5e1" Margin="0 8 0 0" />
+                        <TextBox Text="{Binding SelectedPointName, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Content="Удалить выделенные" Click="DeletePoint_Click" />
+                        <StackPanel Orientation="Horizontal" Margin="0 6 0 0">
+                            <Button Content="Отмена" Command="{Binding UndoCommand}" Width="120" Margin="0 0 6 0" />
+                            <Button Content="Повтор" Command="{Binding RedoCommand}" Width="120" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Импорт/Экспорт" />
+                        <Button Content="Импортировать проект" Command="{Binding ImportCommand}" />
+                        <Button Content="Экспортировать проект" Command="{Binding ExportCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Готовые примеры" />
+                        <ComboBox x:Name="ExampleSelector" SelectedIndex="0" SelectedValuePath="Tag">
+                            <ComboBoxItem Content="Дискретное" Tag="discrete" />
+                            <ComboBoxItem Content="Антидискретное" Tag="indiscrete" />
+                            <ComboBoxItem Content="Серпинский" Tag="sierpinski" />
+                            <ComboBoxItem Content="Случайное" Tag="random" />
+                        </ComboBox>
+                        <Button Content="Создать пример" Command="{Binding GenerateExampleCommand}"
+                                CommandParameter="{Binding SelectedValue, ElementName=ExampleSelector}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Центральная панель холста -->
+        <Border Grid.Column="1" Margin="10 0" Background="#0b1221" CornerRadius="10" Padding="10" BorderBrush="#1f2937" BorderThickness="1">
+            <Grid>
+                <TextBlock Text="Кликните по пустому месту, чтобы добавить точку. Перетаскивайте точки для изменения положения."
+                           Foreground="#475569" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 0 0 8"/>
+                <Canvas x:Name="DrawCanvas"
+                        Background="#0b1221"
+                        MouseLeftButtonDown="Canvas_MouseLeftButtonDown"
+                        MouseMove="Canvas_MouseMove"
+                        MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
+                        Margin="0 24 0 0"
+                        ClipToBounds="True"
+                        Height="780" />
+            </Grid>
+        </Border>
+
+        <!-- Правая панель -->
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Открытые множества" />
+                        <TextBlock Text="Выберите точки и нажмите кнопку для создания открытого множества." Foreground="#94a3b8" TextWrapping="Wrap" />
+                        <TextBox Text="{Binding NewOpenSetName}" />
+                        <Button Content="Создать из выделенных точек" Command="{Binding AddOpenSetCommand}" />
+                        <Button Content="Авто-замыкание" Command="{Binding AutoClosureCommand}" />
+                        <ListBox ItemsSource="{Binding Space.OpenSets}" Margin="0 8 0 0" Background="#0b1221"
+                                 BorderBrush="#1f2937" Foreground="#e2e8f0" SelectedItem="{Binding SelectedOpenSet}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="6" BorderBrush="#1f2937" BorderThickness="1" CornerRadius="6" Margin="0 0 0 6">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Rectangle Width="16" Height="16" Fill="{Binding ColorHex, TargetNullValue=#475569}" Stroke="#1f2937" />
+                                                <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="120" Margin="6 0 0 0" />
+                                                <CheckBox Content="Показать" IsChecked="{Binding IsVisible}" Foreground="#e2e8f0" Margin="6 0 0 0" />
+                                                <Button Content="Удалить" Command="{Binding DataContext.DeleteOpenSetCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" Margin="6 0 0 0" />
+                                            </StackPanel>
+                                            <TextBlock Foreground="#94a3b8" FontSize="12">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource MaskToNamesConverter}">
+                                                        <Binding Path="Mask" />
+                                                        <Binding Path="DataContext.Space.Points" RelativeSource="{RelativeSource AncestorType=Window}" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <StackPanel Orientation="Horizontal" Margin="0 4 0 0">
+                                                <TextBlock Text="Прозрачность" Foreground="#94a3b8" />
+                                                <Slider Minimum="0.1" Maximum="0.9" Value="{Binding Opacity, Mode=TwoWay}" Width="140" Margin="6 0 0 0" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Проверка аксиом" />
+                        <TextBlock Text="{Binding ValidationMessage}" Foreground="#e2e8f0" TextWrapping="Wrap" />
+                        <Button Content="Проверить" Command="{Binding ValidateCommand}" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Свойства" />
+                        <StackPanel Orientation="Vertical" Margin="0 6 0 0">
+                            <TextBlock Text="{Binding Properties.IsT0, StringFormat='T0: {0}'}" Foreground="#e2e8f0" />
+                            <TextBlock Text="{Binding Properties.IsT1, StringFormat='T1: {0}'}" Foreground="#e2e8f0" />
+                            <TextBlock Text="{Binding Properties.IsT2, StringFormat='T2: {0}'}" Foreground="#e2e8f0" />
+                            <TextBlock Text="{Binding Properties.IsConnected, StringFormat='Связно: {0}'}" Foreground="#e2e8f0" />
+                            <TextBlock Text="{Binding Properties.IsCompact, StringFormat='Компактно: {0}'}" Foreground="#e2e8f0" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Непрерывность f: X→Y" />
+                        <TextBlock Text="Загрузите второе пространство Y или сгенерируйте пример." Foreground="#94a3b8" TextWrapping="Wrap" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Импорт Y" Command="{Binding ImportTargetCommand}" Width="120" />
+                            <ComboBox x:Name="TargetExampleSelector" SelectedIndex="0" SelectedValuePath="Tag" Width="160" Margin="6 0 0 0">
+                                <ComboBoxItem Content="Серпинский" Tag="sierpinski" />
+                                <ComboBoxItem Content="Дискретное" Tag="discrete" />
+                                <ComboBoxItem Content="Антидискретное" Tag="indiscrete" />
+                                <ComboBoxItem Content="Случайное" Tag="random" />
+                            </ComboBox>
+                            <Button Content="Генерировать Y" Command="{Binding GenerateTargetExampleCommand}"
+                                    CommandParameter="{Binding SelectedValue, ElementName=TargetExampleSelector}" Margin="6 0 0 0" />
+                        </StackPanel>
+                        <TextBlock Text="Отображение точек:" Foreground="#cbd5e1" Margin="0 6 0 0" />
+                        <ItemsControl ItemsSource="{Binding PointMappings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="0 2 0 0">
+                                        <TextBlock Text="{Binding SourceName}" Width="80" Foreground="#e2e8f0" Margin="0 0 6 0" />
+                                        <ComboBox ItemsSource="{Binding DataContext.TargetSpace.Points, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  SelectedValuePath="Id" DisplayMemberPath="Name"
+                                                  SelectedValue="{Binding TargetId, Mode=TwoWay}" Width="160" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Content="Проверить непрерывность" Command="{Binding CheckContinuityCommand}" Margin="0 6 0 0" />
+                        <TextBlock Text="{Binding ContinuityMessage}" Foreground="#e2e8f0" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource SectionHeader}" Text="Тестирование" />
+                        <TextBlock Text="Быстро создайте известные примеры: дискретное, антидискретное, Серпинского или случайное семейство." Foreground="#94a3b8" TextWrapping="Wrap" />
+                        <Button Content="Случайный кандидат" Command="{Binding GenerateExampleCommand}" CommandParameter="random" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
