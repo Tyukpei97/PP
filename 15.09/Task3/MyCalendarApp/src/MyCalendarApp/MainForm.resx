@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="MainFormTitle" xml:space="preserve">
+    <value>Календарь событий</value>
+  </data>
+  <data name="AddEventButton" xml:space="preserve">
+    <value>Добавить событие</value>
+  </data>
+  <data name="EditEventButton" xml:space="preserve">
+    <value>Редактировать событие</value>
+  </data>
+  <data name="DeleteEventButton" xml:space="preserve">
+    <value>Удалить событие</value>
+  </data>
+  <data name="EventListLabel" xml:space="preserve">
+    <value>Список событий:</value>
+  </data>
+  <data name="DatePickerLabel" xml:space="preserve">
+    <value>Выберите дату:</value>
+  </data>
+</root>

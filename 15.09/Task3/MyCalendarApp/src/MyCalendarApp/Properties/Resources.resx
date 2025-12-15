@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve">
+    <value>My Calendar App</value>
+  </data>
+  <data name="EventAdded" xml:space="preserve">
+    <value>Event has been added successfully.</value>
+  </data>
+  <data name="EventUpdated" xml:space="preserve">
+    <value>Event has been updated successfully.</value>
+  </data>
+  <data name="EventDeleted" xml:space="preserve">
+    <value>Event has been deleted successfully.</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>An error occurred. Please try again.</value>
+  </data>
+</root>

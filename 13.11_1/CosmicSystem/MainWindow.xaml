@@ -1,0 +1,136 @@
+﻿<Window x:Class="CosmicSystem.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CosmicSystem"
+        mc:Ignorable="d"
+        Title="Cosmic System Simulator 3D" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Background" Value="#2A2A2A"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#555"/>
+        </Style>
+
+        <Style TargetType="GroupBox">
+            <Setter Property="Foreground" Value="#FFCC00"/>
+            <Setter Property="BorderBrush" Value="#555"/>
+            <Setter Property="Background" Value="#1A1A1A"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style TargetType="Slider">
+            <Setter Property="Background" Value="#333"/>
+            <Setter Property="Foreground" Value="#FFCC00"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Background="#0A0A1A">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Основная область симуляции с звездным фоном -->
+        <Border Grid.Row="0" Grid.Column="0" BorderBrush="#333" BorderThickness="1">
+            <Canvas x:Name="SimulationCanvas" Background="Transparent" MouseDown="Canvas_MouseDown" MouseWheel="Canvas_MouseWheel">
+                <!-- Звездный фон -->
+                <Canvas x:Name="StarFieldCanvas" Background="Transparent"/>
+            </Canvas>
+        </Border>
+
+        <!-- Панель управления -->
+        <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Background="#1A1A2A">
+                <TextBlock Text="🌌 COSMIC SYSTEM 3D" FontWeight="Bold" FontSize="18" 
+                          Foreground="#FFCC00" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                <GroupBox Header="🚀 Управление симуляцией">
+                    <StackPanel>
+                        <WrapPanel>
+                            <Button x:Name="StartBtn" Content="▶ Старт" Click="StartBtn_Click" Background="#2D7D2D"/>
+                            <Button x:Name="PauseBtn" Content="⏸ Пауза" Click="PauseBtn_Click" Background="#D4A017"/>
+                            <Button x:Name="ResetBtn" Content="🔄 Сброс" Click="ResetBtn_Click" Background="#C42B2B"/>
+                        </WrapPanel>
+                        <TextBlock Text="Скорость времени:" Foreground="#CCC" Margin="0,10,0,5"/>
+                        <Slider x:Name="TimeScaleSlider" Minimum="0.1" Maximum="10" Value="1" 
+                               TickFrequency="0.1" TickPlacement="BottomRight"/>
+                        <TextBlock Text="{Binding ElementName=TimeScaleSlider, Path=Value, StringFormat='{}{0:F1}x'}" 
+                                  Foreground="#FFCC00" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="🛰 Создать объект">
+                    <StackPanel>
+                        <ComboBox x:Name="ObjectTypeCombo" Background="#2A2A2A" Foreground="White" SelectedIndex="0">
+                            <ComboBoxItem Content="🚀 Космический аппарат"/>
+                            <ComboBoxItem Content="🪐 Планета"/>
+                            <ComboBoxItem Content="☄️ Астероид"/>
+                            <ComboBoxItem Content="⭐ Звезда"/>
+                        </ComboBox>
+
+                        <TextBlock Text="Масса (×10²¹ кг):" Foreground="#CCC" Margin="0,10,0,5"/>
+                        <Slider x:Name="MassSlider" Minimum="1" Maximum="10000" Value="100" 
+                               TickFrequency="100" TickPlacement="BottomRight"/>
+                        <TextBlock Text="{Binding ElementName=MassSlider, Path=Value, StringFormat='{}{0:F0}'}" 
+                                  Foreground="#FFCC00" HorizontalAlignment="Center" FontWeight="Bold"/>
+
+                        <TextBlock Text="Начальная скорость:" Foreground="#CCC" Margin="0,10,0,5"/>
+                        <Slider x:Name="VelocitySlider" Minimum="0" Maximum="500" Value="100" 
+                               TickFrequency="50" TickPlacement="BottomRight"/>
+                        <TextBlock Text="{Binding ElementName=VelocitySlider, Path=Value, StringFormat='{}{0:F0} км/с'}" 
+                                  Foreground="#FFCC00" HorizontalAlignment="Center" FontWeight="Bold"/>
+
+                        <CheckBox x:Name="ShowTrajectoryCheck" Content="Показывать траектории" 
+                                 Foreground="#CCC" IsChecked="True" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="📊 Информация о системе">
+                    <StackPanel>
+                        <TextBlock x:Name="InfoText" TextWrapping="Wrap" Foreground="#CCC" Text="Статус: Готов"/>
+                        <TextBlock x:Name="SelectedObjectInfo" TextWrapping="Wrap" Foreground="#FFCC00" 
+                                  Margin="0,10,0,0" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="🌠 Визуальные эффекты">
+                    <StackPanel>
+                        <CheckBox x:Name="GlowEffectCheck" Content="Свечение объектов" Foreground="#CCC" IsChecked="True"/>
+                        <CheckBox x:Name="AtmosphereEffectCheck" Content="Атмосферные эффекты" Foreground="#CCC" IsChecked="True"/>
+                        <CheckBox x:Name="StarFieldCheck" Content="Звездное поле" Foreground="#CCC" IsChecked="True"/>
+
+                        <TextBlock Text="Масштаб:" Foreground="#CCC" Margin="0,10,0,5"/>
+                        <Slider x:Name="ScaleSlider" Minimum="0.5" Maximum="2" Value="1" 
+                               TickFrequency="0.1" TickPlacement="BottomRight"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Статус бар -->
+        <StatusBar Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Background="#1A1A2A" Foreground="#CCC">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusText" Text="Готов к симуляции"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock x:Name="TimeText" Text="Время: 0с" Margin="20,0,0,0"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock x:Name="ObjectCountText" Text="Объектов: 0" Margin="20,0,0,0"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock x:Name="FpsText" Text="FPS: 0" Margin="20,0,0,0"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

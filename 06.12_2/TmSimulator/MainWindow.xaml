@@ -1,0 +1,75 @@
+<Window x:Class="TmSimulator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:TmSimulator.UI.Views"
+        xmlns:vm="clr-namespace:TmSimulator.UI.ViewModels"
+        xmlns:render="clr-namespace:TmSimulator.UI.Rendering"
+        mc:Ignorable="d"
+        Title="Симулятор машины Тьюринга" Height="900" Width="1400" Background="#0A101B"
+        KeyDown="Window_KeyDown">
+    <Window.Resources>
+        <render:SimulationStatusConverter x:Key="SimulationStatusConverter"/>
+    </Window.Resources>
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="280"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#0F172A" CornerRadius="8" Padding="6">
+            <TabControl x:Name="MachineTabs">
+                <TabItem Header="Машина A">
+                    <views:MachineWorkspaceView DataContext="{Binding MachineA}"/>
+                </TabItem>
+                <TabItem Header="Машина B">
+                    <views:MachineWorkspaceView DataContext="{Binding MachineB}"/>
+                </TabItem>
+            </TabControl>
+        </Border>
+
+        <Border Grid.Row="1" Background="#0F172A" CornerRadius="8" Padding="8" Margin="0 8 0 8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="320"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Тестовые входы (общие для сравнения)" Foreground="White" FontWeight="Bold"/>
+                    <TextBox x:Name="NewTestInput" Margin="0 6 0 6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0 0 0 6">
+                        <Button Content="Добавить" Command="{Binding AddTestInputCommand}" CommandParameter="{Binding Text, ElementName=NewTestInput}" Margin="0 0 6 0"/>
+                        <Button Content="Удалить" Command="{Binding RemoveTestInputCommand}" CommandParameter="{Binding Text, ElementName=NewTestInput}"/>
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding TestInputs}" Height="160"/>
+                    <TextBlock Text="Сравнение не является доказательством эквивалентности — только на конечном наборе тестов." TextWrapping="Wrap" Foreground="#BBC7E7" Margin="0 6 0 0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Сравнить машины на тестах" Command="{Binding CompareCommand}" Margin="0 0 6 0"/>
+                        <TextBlock Text="{Binding GlobalStatus}" Foreground="#D6EAF8" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <DataGrid ItemsSource="{Binding ComparisonResults}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0 6 0 0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Ввод" Binding="{Binding Input}"/>
+                            <DataGridTextColumn Header="Статус A" Binding="{Binding StatusA, Converter={StaticResource SimulationStatusConverter}}"/>
+                            <DataGridTextColumn Header="Статус B" Binding="{Binding StatusB, Converter={StaticResource SimulationStatusConverter}}"/>
+                            <DataGridTextColumn Header="Выход A" Binding="{Binding OutputA}" Width="*"/>
+                            <DataGridTextColumn Header="Выход B" Binding="{Binding OutputB}" Width="*"/>
+                            <DataGridTextColumn Header="Вердикт" Binding="{Binding Verdict}" Width="160"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Background="#0B253D" CornerRadius="6" Padding="6">
+            <TextBlock Text="Управление: пробел — старт/пауза, F10 — шаг, Ctrl+R — сброс." Foreground="#BBE1FA"/>
+        </Border>
+    </Grid>
+</Window>

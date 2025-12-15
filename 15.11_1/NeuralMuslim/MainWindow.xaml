@@ -1,0 +1,127 @@
+﻿<Window x:Class="NeuralMuslim.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Neural Network Visual Simulator" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="#f5f0ff">
+
+    <Window.Resources>
+        <LinearGradientBrush x:Key="BackgroundGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#f5f0ff" Offset="0"/>
+            <GradientStop Color="#e6d7ff" Offset="1"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="GlowButton" TargetType="Button">
+            <Setter Property="Background" Value="#8a2be2"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5"
+                                BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DropShadowEffect x:Key="PurpleGlow" BlurRadius="10" ShadowDepth="0" Color="#8a2be2"/>
+        <DropShadowEffect x:Key="PinkGlow" BlurRadius="10" ShadowDepth="0" Color="#da70d6"/>
+        <DropShadowEffect x:Key="VioletGlow" BlurRadius="10" ShadowDepth="0" Color="#9400d3"/>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource BackgroundGradient}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая панель управления -->
+        <Border Grid.Column="0" Background="#f0e6ff" CornerRadius="0,20,20,0" Margin="0,0,10,0" BorderBrush="#d8bfd8" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="15">
+                    <!-- Заголовок -->
+                    <Border Background="#e6d7ff" CornerRadius="10" Padding="10" Margin="0,0,0,20" BorderBrush="#d8bfd8" BorderThickness="1">
+                        <TextBlock Text="NEURAL SIMULATOR" 
+                                   Foreground="#4b0082" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   HorizontalAlignment="Center"/>
+                    </Border>
+
+                    <!-- Режимы работы -->
+                    <TextBlock Text="SIMULATION MODE" Foreground="#6a0dad" FontWeight="Bold" Margin="0,10,0,5"/>
+                    <ComboBox x:Name="cmbMode" Background="White" Foreground="Black" BorderThickness="1" BorderBrush="#d8bfd8" Padding="8">
+                        <ComboBoxItem Content="Signal Propagation" IsSelected="True"/>
+                        <ComboBoxItem Content="Training Process"/>
+                        <ComboBoxItem Content="Pattern Recognition"/>
+                        <ComboBoxItem Content="Data Clustering"/>
+                    </ComboBox>
+
+                    <!-- Параметры сети -->
+                    <TextBlock Text="NETWORK PARAMS" Foreground="#6a0dad" FontWeight="Bold" Margin="0,20,0,5"/>
+
+                    <Border Background="#f0e6ff" CornerRadius="8" Padding="10" Margin="0,0,0,10" BorderBrush="#d8bfd8" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="Layers: 3" Foreground="#4b0082" FontSize="11"/>
+                            <TextBlock Text="Neurons: 156" Foreground="#4b0082" FontSize="11"/>
+                            <TextBlock Text="Connections: 2,840" Foreground="#4b0082" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Управление анимацией -->
+                    <TextBlock Text="ANIMATION CONTROL" Foreground="#6a0dad" FontWeight="Bold" Margin="0,10,0,5"/>
+                    <Button x:Name="btnStart" Content="START FLOW" Style="{StaticResource GlowButton}" Click="BtnStart_Click"/>
+                    <Button x:Name="btnPulse" Content="PULSE WAVE" Style="{StaticResource GlowButton}" 
+                            Background="#da70d6" Click="BtnPulse_Click" Margin="0,8,0,0"/>
+                    <Button x:Name="btnReset" Content="RESET" Style="{StaticResource GlowButton}" 
+                            Background="#9400d3" Click="BtnReset_Click" Margin="0,8,0,0"/>
+
+                    <!-- Визуальные эффекты -->
+                    <TextBlock Text="VISUAL EFFECTS" Foreground="#6a0dad" FontWeight="Bold" Margin="0,20,0,5"/>
+                    <CheckBox x:Name="chkGlow" Content="Neuron Glow" Foreground="#4b0082" IsChecked="True"/>
+                    <CheckBox x:Name="chkParticles" Content="Data Particles" Foreground="#4b0082" IsChecked="True" Margin="0,5,0,0"/>
+                    <CheckBox x:Name="chkConnections" Content="Active Connections" Foreground="#4b0082" IsChecked="True" Margin="0,5,0,0"/>
+
+                    <!-- Статистика -->
+                    <Border Background="#e6d7ff" CornerRadius="10" Padding="10" Margin="0,20,0,0" BorderBrush="#d8bfd8" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="SIMULATION STATS" Foreground="#6a0dad" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <TextBlock x:Name="txtStats" Text="Ready to simulate..." Foreground="#4b0082" FontSize="11" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Основная область визуализации -->
+        <Border Grid.Column="1" Background="White" CornerRadius="20,0,0,20" BorderBrush="#d8bfd8" BorderThickness="1">
+            <Grid>
+                <!-- Фон с сеткой -->
+                <Canvas x:Name="gridCanvas" Background="Transparent"/>
+
+                <!-- Канвас для нейросети -->
+                <Canvas x:Name="networkCanvas" Background="Transparent"/>
+
+                <!-- Канвас для частиц -->
+                <Canvas x:Name="particleCanvas" Background="Transparent"/>
+
+                <!-- Графики -->
+                <Border x:Name="chartsPanel" Background="#f0e6ff" CornerRadius="15" 
+                        VerticalAlignment="Bottom" HorizontalAlignment="Right" 
+                        Margin="20" Width="300" Height="150" Opacity="0.9" BorderBrush="#d8bfd8" BorderThickness="1">
+                    <Canvas x:Name="chartCanvas" Background="Transparent" Margin="10"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
